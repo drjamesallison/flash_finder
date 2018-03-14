@@ -11,4 +11,4 @@ export DYLD_LIBRARY_PATH=$MULTINEST/lib:${DYLD_LIBRARY_PATH}
 # export LD_LIBRARY_PATH=$MULTINEST/lib:${LD_LIBRARY_PATH}
 
 # Set path to Matplotlib set up
-export MATPLOTLIBRC=$HABSNEST/matplotlib/
+export MATPLOTLIBRC=$FINDER/matplotlib/
