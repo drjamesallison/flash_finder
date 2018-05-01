@@ -1,0 +1,6 @@
+#ID COMPONENT PARAMETRIZATION PRIORS
+#1 emission gaussian [x0,linear,auto,auto] [dx,linear,0.1,2000] [y0,linear,auto,10.]
+2 absorption gaussian [x0,linear,auto,auto] [dx,log,0.1,2000] [y0,log,auto,auto]
+#3 absorption gaussian [x0,linear,auto,auto] [dx,log,0.1,2000] [y0,log,auto,auto]
+#4 continuum polynomial [c0,log,1,1.e3] [fc,linear,-1,1]
+#5 calibration calibration [cal,normal,1.0,0.1]
