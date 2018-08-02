@@ -1,9 +1,13 @@
 # Set path to FLASH FINDER
-FINDER=$HOME/software/flash_finder/ 
+ACES=$HOME/software/ACES/
+FINDER=$ACES/flash_finder/ 
 export FINDER
 
 # Set path to MULTINEST
 export MULTINEST=$HOME/software/MultiNest_v3.10/
+
+# Set path to PYMULTINEST
+export PYMULTINEST=$HOME/software/pymultinest/
 
 # Add MultiNest library to dynamic library path
 export DYLD_LIBRARY_PATH=$MULTINEST/lib:${DYLD_LIBRARY_PATH}

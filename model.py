@@ -267,7 +267,7 @@ class Model():
             chanfunc = source.spectrum.y.chanfunc[1,:]
             chanfunc = np.append(chanfunc[-1:0:-1],chanfunc)
             self.output.tmp.data = np.convolve(chanfunc,self.output.tmp.data,mode='same')
-            self.output.tmp.data = self.output.tmp.data[0::data.x.chansamp]
+            self.output.tmp.data = self.output.tmp.data[0::source.spectrum.x.chansamp]
             self.output.tmp.data /= chanfunc.sum()
             self.output.tmp.data[0] = ledge
             self.output.tmp.data[-1] = hedge

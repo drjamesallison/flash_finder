@@ -26,8 +26,10 @@ class Spectrum():
 
         # Read data from file
         data = np.genfromtxt(self.filename, comments='#')
-        self.x.data = data[:,0][data[:,0]>=float(options.x_min)]
-        self.y.data = data[:,1][data[:,0]<=float(options.x_max)] 
+        self.x.data = data[:,0][(data[:,0]>=float(options.x_min))&(data[:,0]<=float(options.x_max))]
+        self.x.data = data[:,0][(data[:,0]>=float(options.x_min))&(data[:,0]<=float(options.x_max))]    
+        self.y.data = data[:,1][(data[:,0]>=float(options.x_min))&(data[:,0]<=float(options.x_max))] 
+        self.y.data = data[:,1][(data[:,0]>=float(options.x_min))&(data[:,0]<=float(options.x_max))]         
 
         # Calculate noise level
         if (np.size(data,1) > 2) and (not options.std_madfm):

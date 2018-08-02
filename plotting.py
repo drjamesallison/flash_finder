@@ -48,11 +48,11 @@ def bestfit_spectrum(options,source,model):
                 shift_z = 0.5*(source.spectrum.x.data[-1]+source.spectrum.x.data[0])
             else:
                 if 'emission' in model.input.types:
-                    shift_z += mode[i]['maximum'][ind]
+                    shift_z += mode['maximum'][ind]
                     count += 1.0
                     ind += 4
                 if 'absorption' in model.input.types:
-                    shift_z += mode[i]['maximum'][ind]
+                    shift_z += mode['maximum'][ind]
                     count += 1.0
                 shift_z /= count
                 if options.x_units == 'optvel':
@@ -88,6 +88,7 @@ def bestfit_spectrum(options,source,model):
                 y_line.append(comp.output.tmp.data)
             param_ind += ndims
             comp_ind += 1
+        y_line = np.array(y_line)
 
         # If convert y-units
         if options.y_units == 'opd':
@@ -231,7 +232,11 @@ def posterior_plot(options,source,model):
 
     # Loop over detection modes
     i = 0
-    for posterior in model.output.sline.get_separated_stats().separated_posterior:
+    if options.mmodal:
+        posterior_list = model.output.sline.get_separated_stats().separated_posterior
+    else:
+        posterior_list = [model.output.sline.get_data()]
+    for posterior in posterior_list:
 
         # Initialize indexing
         offset_ind = 2

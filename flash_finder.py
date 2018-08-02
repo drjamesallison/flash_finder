@@ -13,6 +13,7 @@ import string
 import numpy as np
 import warnings
 from astropy.io import ascii
+sys.path.append(os.environ['PYMULTINEST'])
 import pymultinest
 
 # Import habs nest python modules
