@@ -144,7 +144,8 @@ def bestfit_spectrum(options,source,model):
         # Plot spectra 
         #if options.channel_function == 'square':
         ax1.step(x_data, y_contsub, where='mid', color=[0.5,0.5,0.5], linestyle='-')
-        ax1.step(x_data, np.sum(y_line,0), where='mid', color='k', linestyle='-') 
+        if (model.output.ndetections > 0):
+            ax1.step(x_data, np.sum(y_line,0), where='mid', color='k', linestyle='-') 
         ax2.step(x_data, y_res, where='mid', color='r', linestyle='-')
         # else:
         #    ax1.plot(x_data, y_contsub, color=[0.5,0.5,0.5], linestyle='-')
