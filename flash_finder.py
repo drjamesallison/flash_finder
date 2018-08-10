@@ -54,12 +54,35 @@ if (mpi_rank == 0) or (not options.init_MPI):
     print '******************************************************************************\n'
 
     # Read source information from file
-    source_list = ascii.read(options.data_path+'sources.log',format='commented_header',comment='#')
+    if (mpi_rank == 0):
 
-    # Check for required information
-    if 'name' not in source_list.colnames:
-        print "\nCPU %d:Please specify source names in %s\n" % (mpi_rank,options.data_path+'sources.log')
-        sys.exit(1)
+        source_list = ascii.read(options.data_path+'sources.log',format='commented_header',comment='#')
+
+        # Check for required information
+        if 'name' not in source_list.colnames:
+            print "\nCPU %d:Please specify source names in %s\n" % (mpi_rank,options.data_path+'sources.log')
+            sys.exit(1)
+
+    # Distribute source list amongst processors
+    if options.mpi_switch:
+
+        if (mpi_rank == 0):
+            list_chunks = [[] for _ in range(mpi_size)]
+            for i, list_chunk in enumerate(source_list):
+                list_chunks[i % mpi_size].append(list_chunk)
+        else:
+            list_chunks = None
+
+    # Wait for all processors to reach this point
+    if options.mpi_switch:
+        mpi_comm.Barrier()
+
+    if options.mpi_switch:
+        source_list = mpi_comm.scatter(list_chunks,root=0)
+
+    # Wait for all processors to reach this point
+    if options.mpi_switch:
+        mpi_comm.Barrier()
 
     # Initialize output results file
     if (mpi_rank == 0):
@@ -68,6 +91,10 @@ if (mpi_rank == 0) or (not options.init_MPI):
         model = Model()
         model.input.generate_model(options,source)
         initialize_resultsfile(options,model)
+
+    # Wait for all processors to reach this point
+    if options.mpi_switch:
+        mpi_comm.Barrier()
 
     # Loop program over each source spectral data 
     source_count = 0
@@ -83,10 +110,7 @@ if (mpi_rank == 0) or (not options.init_MPI):
         source.number = source_count
         source.info = line
 
-        # Decide whether cpu should work on this source
-        source.rank = np.remainder(source.number,mpi_size)
-        if (source.rank != mpi_rank) and (options.init_MPI == False):
-            continue
+        # Report source name 
         print "\nCPU %d: Working on Source %s.\n" % (mpi_rank,source.info['name'])
 
         # Assign output root name
