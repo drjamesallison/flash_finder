@@ -13,7 +13,8 @@ import string
 import numpy as np
 import warnings
 from astropy.io import ascii
-sys.path.append(os.environ['PYMULTINEST'])
+if 'PYMULTINEST' in os.environ:
+    sys.path.append(os.environ['PYMULTINEST'])
 import pymultinest
 
 # Import habs nest python modules
@@ -40,7 +41,6 @@ if options.mpi_switch:
     mpi_comm = MPI.COMM_WORLD
     mpi_size = mpi_comm.Get_size()
     mpi_rank = mpi_comm.Get_rank()
-    MPI.Finalize()
 
 # Determine if CPU should do the following
 if (mpi_rank == 0) or (not options.init_MPI):
@@ -157,6 +157,9 @@ if (mpi_rank == 0) or (not options.init_MPI):
             # Obtain output
             model.output.cont = pymultinest.Analyzer(n_params=mnest_args['n_params'],outputfiles_basename=mnest_args['outputfiles_basename'])
 
+            # Update null evidence to include continuum-only model evidence
+            model.output.null.logZ += model.output.cont.get_stats()['global evidence']
+
         # Run habs nest to fit for spectral-lines
 
         # Print message to screen
@@ -168,10 +171,8 @@ if (mpi_rank == 0) or (not options.init_MPI):
         mnest_args['n_clustering_params'] = 3
         mnest_args['outputfiles_basename'] = options.out_root + '_spectline_'
         mnest_args['multimodal'] = options.mmodal
-        if 'continuum' in model.input.types:
-            mnest_args['null_log_evidence'] = options.detection_limit+model.output.cont.get_stats()['global evidence']
-        else:
-            mnest_args['null_log_evidence'] = options.detection_limit
+        mnest_args['null_log_evidence'] = -1.e99 # options.detection_limit
+        mnest_args['mode_tolerance'] = -1.e99 # options.detection_limit
         pymultinest.run(**mnest_args)
 
         # Print message to screen
@@ -187,10 +188,6 @@ if (mpi_rank == 0) or (not options.init_MPI):
         model.output.ndetections = 0
         for mode in model.output.sline.get_mode_stats()['modes']:
             mode_evidence = mode['local log-evidence']            
-            if 'continuum' in model.input.types:
-                mode_evidence -= model.output.cont.get_mode_stats()['global evidence']
-            else:
-                mode_evidence -= model.output.null.logZ
             if mode_evidence >= options.detection_limit:
                 model.output.ndetections += 1
         if model.output.ndetections == 1:

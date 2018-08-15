@@ -27,11 +27,8 @@ def bestfit_spectrum(options,source,model):
         mode_evidence = mode['local log-evidence']
         mode_evidence_err =  mode['local log-evidence error']
         if 'continuum' in model.input.types:
-            mode_evidence -= model.output.cont.get_mode_stats()['global evidence']
             tmp = model.output.cont.get_mode_stats()['global evidence error']
             mode_evidence_err = np.sqrt(np.power(mode_evidence_err,2) + np.power(tmp,2))
-        else:
-            mode_evidence -= model.output.null.logZ
 
         # Set x-axis data
         if options.plot_restframe == 'source':
@@ -238,6 +235,18 @@ def posterior_plot(options,source,model):
     else:
         posterior_list = [model.output.sline.get_data()]
     for posterior in posterior_list:
+
+        # Calculate mode evidence
+        mode = model.output.sline.get_mode_stats()['modes'][i]
+        mode_evidence = mode['local log-evidence']
+        mode_evidence_err =  mode['local log-evidence error']
+        if 'continuum' in model.input.types:
+            tmp = model.output.cont.get_mode_stats()['global evidence error']
+            mode_evidence_err = np.sqrt(np.power(mode_evidence_err,2) + np.power(tmp,2))
+
+        # If mode evidence less than zero then move to next iteration
+        if (mode_evidence < options.detection_limit):
+            continue
 
         # Initialize indexing
         offset_ind = 2

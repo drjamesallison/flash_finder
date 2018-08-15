@@ -76,14 +76,15 @@ def write_resultsfile(options,source,model):
         mode_evidence = mode['local log-evidence']
         mode_evidence_err =  mode['local log-evidence error']
         if 'continuum' in model.input.types:
-            mode_evidence -= model.output.cont.get_mode_stats()['global evidence']
             tmp = model.output.cont.get_mode_stats()['global evidence error']
             mode_evidence_err = np.sqrt(np.power(mode_evidence_err,2) + np.power(tmp,2))
-        else:
-            mode_evidence -= model.output.null.logZ
+
+        # If mode evidence less than zero then move to next iteration
+        if (model.output.ndetections > 0) and (mode_evidence < options.detection_limit):
+            continue
 
         # Add source name and mode number
-        if model.output.ndetections == 0:
+        if (model.output.ndetections == 0):
             text = '%s %i' % (source.info['name'], i)
         else:
             text = '%s %i' % (source.info['name'], i+1)
@@ -157,17 +158,20 @@ def write_resultsfile(options,source,model):
                 loglhood = model.output.cont.get_best_fit()['log_likelihood']
             else:
                 loglhood = 0.
+
         else:
             text += ' %g %g' % (mode_evidence, mode_evidence_err)
             if options.mmodal:
                 loglhood = model.output.sline.separated_stats['best_fit'][i]['log_likelihood']
             else:
                 loglhood = model.output.sline.get_best_fit()['log_likelihood']
+        
         nfreedegs = len(source.spectrum.x.data)-model.input.all_ndims
-        mode_chisq = -2.*(loglhood-model.output.null.loglhood0)/(nfreedegs)
+        mode_chisq = -2.*(loglhood+model.output.null.logZ-model.output.null.loglhood0)/(nfreedegs)
         mode_chisq_err = np.sqrt(2./float(len(source.spectrum.x.data)))
         text += ' %g %g\n' % (mode_chisq, mode_chisq_err)
-        f.write(text)
+        
+        f.write(text)   
 
         # Increment
         i += 1
