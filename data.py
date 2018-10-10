@@ -31,15 +31,20 @@ class Spectrum():
         self.y.data = data[:,1][(data[:,0]>=float(options.x_min))&(data[:,0]<=float(options.x_max))] 
         self.y.data = data[:,1][(data[:,0]>=float(options.x_min))&(data[:,0]<=float(options.x_max))]         
 
+        # Invert data if required
+        if options.invert_spectra:
+            self.y.data = -1*self.y.data
+
         # Calculate noise level
         if (np.size(data,1) > 2) and (not options.std_madfm):
             self.y.sigma = data[:,2]
         else:
             filtered = self.y.data[~np.isnan(self.y.data) & (self.y.data!=0.0)]
             sigma_rough = std_madfm(filtered)
-            clipped = filtered[np.abs(filtered)<=3.0*sigma_rough]
+            clipped = filtered[np.abs(filtered-np.median(filtered))<=3.0*sigma_rough]
             self.y.sigma = std_madfm(clipped)*np.ones(self.y.data.shape)
         self.y.sigma *= options.noise_factor
+
         self.ndata = len(self.x.data)
 
         # Down weight all channels flagged with 'NaN' or "0"
@@ -66,7 +71,7 @@ class Spectrum():
 
         # Convert data spectrum to redshift
         if options.x_units == 'frequency':
-            self.x.data = freqTOz(self.x.data, constants.HI_FREQ)
+            self.x.data = freqTOz(self.x.data,options.rest_frequency)
         elif options.x_units == 'optvel':
             self.x.data /= constants.LIGHT_SPEED
         elif options.x_units == 'redshift':
@@ -93,9 +98,9 @@ class Spectrum():
                     pass
                 else:
                     upper_z = self.x.data[ind]
-                    upper_freq = zTOfreq(upper_z,constants.HI_FREQ)
+                    upper_freq = zTOfreq(upper_z,options.rest_frequency)
                     lower_z = self.x.data[ind-1]
-                    lower_freq = zTOfreq(lower_z,constants.HI_FREQ)
+                    lower_freq = zTOfreq(lower_z,options.rest_frequency)
                     dfreq = (upper_freq - lower_freq)/self.x.chansamp
                     fine_freq = lower_freq + np.array(range(0,self.x.chansamp))*dfreq
                     fine_z = freqTOz(fine_freq,constants.HI_FREQ)

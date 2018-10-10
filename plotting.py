@@ -30,6 +30,10 @@ def bestfit_spectrum(options,source,model):
             tmp = model.output.cont.get_mode_stats()['global evidence error']
             mode_evidence_err = np.sqrt(np.power(mode_evidence_err,2) + np.power(tmp,2))
 
+        # If mode evidence less than zero then move to next iteration
+        if (mode_evidence < options.detection_limit):
+            continue
+
         # Set x-axis data
         if options.plot_restframe == 'source':
             shift_z = source.info['z']
@@ -246,6 +250,10 @@ def posterior_plot(options,source,model):
 
         # If mode evidence less than zero then move to next iteration
         if (mode_evidence < options.detection_limit):
+
+        	# Increment
+            i += 1
+
             continue
 
         # Initialize indexing

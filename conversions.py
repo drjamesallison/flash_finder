@@ -3,8 +3,8 @@ import numpy as np
 # Define constants class
 class Constants():
     def __init__(self):
-        self.HI_FREQ = 1420.405752 # MHz
-        # self.HI_FREQ = 1.420405752 # GHz
+        # self.HI_FREQ = 1420.405752 # MHz
+        self.HI_FREQ = 1.420405752 # GHz
         self.LIGHT_SPEED = 2.99792458e5 # km/s
 
 # Convert redshift to frequency

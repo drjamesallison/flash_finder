@@ -455,7 +455,7 @@ class Input():
                                 prior[2] = source.info['z'] - \
                                             abs(float(options.x0_sigma))
                                 if options.x_units == 'frequency':
-                                    prior[2] = freqTOz(prior[2], constants.HI_FREQ)
+                                    prior[2] = freqTOz(prior[2], options.rest_frequency)
                                 elif options.x_units == 'optvel':
                                     prior[2] /= constants.LIGHT_SPEED
 
@@ -465,7 +465,7 @@ class Input():
                                 prior[3] = source.info['z'] + \
                                             abs(float(options.x0_sigma))            
                                 if options.x_units == 'frequency':
-                                    prior[3] = freqTOz(prior[3], constants.HI_FREQ)
+                                    prior[3] = freqTOz(prior[3], options.rest_frequency)
                                 elif options.x_units == 'optvel':
                                     prior[3] /= constants.LIGHT_SPEED
 
@@ -474,7 +474,7 @@ class Input():
                             if 'source' in prior[2]:
                                 prior[2] = source.info['z']
                                 if options.x_units == 'frequency':
-                                    prior[2] = freqTOz(prior[2], constants.HI_FREQ)
+                                    prior[2] = freqTOz(prior[2], options.rest_frequency)
                                 elif options.x_units == 'optvel':
                                     prior[2] /= constants.LIGHT_SPEED
 
@@ -483,7 +483,7 @@ class Input():
                             elif 'source' in prior[3]:
                                 prior[3] = source.info['z']
                                 if options.x_units == 'frequency':
-                                    prior[3] = freqTOz(prior[3], constants.HI_FREQ)
+                                    prior[3] = freqTOz(prior[3], options.rest_frequency)
                                 elif options.x_units == 'optvel':
                                     prior[3] /= constants.LIGHT_SPEED
 
@@ -493,10 +493,20 @@ class Input():
                         if options.y_units == 'opd':                                         
 
                             if 'auto' in prior[2]:
-                                prior[2] = -1.e-2*np.min(source.spectrum.y.sigma)
 
+                                prior[2] = 1.e-2*np.min(source.spectrum.y.sigma)
+
+                                if 'absorption' in comp_typ:
+
+                                    prior[2] *= -1.
+                                
                             if 'auto' in prior[3]:
-                                prior[3] = -1.0
+                                
+                                prior[3] = 1.0
+
+                                if 'absorption' in comp_typ:
+
+                                    prior[3] *= -1.
 
                         else:
 

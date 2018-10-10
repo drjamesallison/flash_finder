@@ -26,6 +26,8 @@ parser.add_argument('--flux_limit', default=1.0e99, type=float,
                     help='maximum possible value for spectral line parametrisation')
 parser.add_argument('--init_MPI', action='store_true', default=False,
                     help='use MPI in MultiNest')
+parser.add_argument('--invert_spectra', action='store_true', default=False,
+                    help='invert input spectra')
 parser.add_argument('--mmodal', action='store_true', default=False,
                     help='mmodal parameter used in MultiNest')
 parser.add_argument('--model_path', default=os.getcwd()+'/model.txt', type=str,
@@ -52,6 +54,8 @@ parser.add_argument('--plot_nchans', default=200, type=int,
                     help='number of spectral channels to plot')
 parser.add_argument('--plot_restframe', choices = ['none','source','peak'], default='peak', type=str,
                     help='restframe used for plotting')
+parser.add_argument('--rest_frequency', default=1.420405752, type=float,
+                    help='rest frequency of transition in GHz')
 parser.add_argument('--small_plots', action='store_true', default=False,
                     help='plot a small range of the x-axis')
 parser.add_argument('--std_madfm', action='store_true', default=False,
@@ -63,7 +67,7 @@ parser.add_argument('--verbose',action='store_true',default=False,
 parser.add_argument('--watch',action='store_true',default=False,
                     help='switch on progress plots')
 parser.add_argument('--x_units', choices = ['frequency','optvel','redshift'], default='optvel', type=str,
-                    help='units for the spectral x-axis (MHz, km/s or z)')
+                    help='units for the spectral x-axis (GHz, km/s or z)')
 parser.add_argument('--x_max', default=1.e99, type=float,
                     help='maximum value for x-axis')
 parser.add_argument('--x_min', default=-1.e99, type=float,

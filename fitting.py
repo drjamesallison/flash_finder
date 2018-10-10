@@ -100,7 +100,7 @@ def LogLGen(options,source,model):
         # Calculate log-likelihood
         lnew = model.output.null.loglhood0 - 0.5*chisq
         lnew -= model.output.null.logZ
-    
+        
         return lnew
     return LogL
 
