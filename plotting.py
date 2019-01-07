@@ -233,15 +233,17 @@ def posterior_plot(options,source,model):
         return
 
     # Loop over detection modes
-    i = 0
+    mode_count = 0
+    plot_count = 0
     if options.mmodal:
         posterior_list = model.output.sline.get_separated_stats().separated_posterior
     else:
         posterior_list = [model.output.sline.get_data()]
+   
     for posterior in posterior_list:
 
         # Calculate mode evidence
-        mode = model.output.sline.get_mode_stats()['modes'][i]
+        mode = model.output.sline.get_mode_stats()['modes'][mode_count]
         mode_evidence = mode['local log-evidence']
         mode_evidence_err =  mode['local log-evidence error']
         if 'continuum' in model.input.types:
@@ -250,10 +252,7 @@ def posterior_plot(options,source,model):
 
         # If mode evidence less than zero then move to next iteration
         if (mode_evidence < options.detection_limit):
-
-        	# Increment
-            i += 1
-
+            mode_count += 1
             continue
 
         # Initialize indexing
@@ -323,8 +322,8 @@ def posterior_plot(options,source,model):
             fig.tight_layout()
 
             # Save figure to file
-            fig.savefig(options.out_root+'_line_'+str(i+1)+'_absorption_posterior.pdf')
+            fig.savefig(options.out_root+'_line_'+str(plot_count+1)+'_absorption_posterior.pdf')
 
         # Increment
-        i += 1
+        plot_count += 1
 
