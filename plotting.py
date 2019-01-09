@@ -39,7 +39,7 @@ def bestfit_spectrum(options,source,model):
             shift_z = source.info['z']
             if options.x_units == 'optvel':
                 shift_z /= constants.LIGHT_SPEED
-            rest_z = shift_frame(source.x.data,source.info['z'])
+            rest_z = shift_frame(source.spectrum.x.data,source.info['z'])
             x_data = zTOvel(rest_z,'relativistic')*constants.LIGHT_SPEED            
         elif options.plot_restframe == 'peak':
             ind = model.input.all_ndims
@@ -325,5 +325,6 @@ def posterior_plot(options,source,model):
             fig.savefig(options.out_root+'_line_'+str(plot_count+1)+'_absorption_posterior.pdf')
 
         # Increment
+        mode_count += 1
         plot_count += 1
 

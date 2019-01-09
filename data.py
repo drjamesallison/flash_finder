@@ -8,7 +8,13 @@ class Source():
     def __init__(self):
         self.number = 0
         self.rank = 0
-        self.info = {'flux':0.}
+        self.info = {'name':'',
+                    'flux':0.,
+                    'e_flux':0.,
+                    'z':0.,
+                    'e_z':0.,
+                    'ra':'00:00:00',
+                    'dec':'00:00:00'}
         self.spectrum = Spectrum()
 
 # Define spectrum class
