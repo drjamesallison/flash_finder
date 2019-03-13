@@ -101,7 +101,7 @@ class Model():
                     # Peak parameter
                     if 'y0' in prior[0]:
                         y0 = cube[cube_ind]
-                        if options.param_out == 'median':
+                        if options.param_out == 'median': 
                             if y0 > y0_before:
                                 self.output.tmp.unphys = True
                             y0_before = y0
@@ -182,7 +182,7 @@ class Model():
                     if 'y0' in prior[0]:
                         y0 = cube[cube_ind]
                         if options.param_out == 'median':
-                            if y0 < -1.*np.abs(y0_before):
+                            if y0 > np.abs(y0_before):
                                 self.output.tmp.unphys = True
                             y0_before = y0
 
@@ -223,6 +223,10 @@ class Model():
                         line = 0.0
                     else:
                         line = y0*tmp/np.max(tmp)
+
+                # Convert from optical depth to absorbed flux
+                if options.y_units == 'opd':
+                    line = 1. - np.exp(-line)
 
                 # Accumulate absorption component
                 self.output.tmp.abs += line
@@ -495,36 +499,24 @@ class Input():
                             if 'auto' in prior[2]:
 
                                 prior[2] = 1.e-2*np.min(source.spectrum.y.sigma)
-
-                                if 'absorption' in comp_typ:
-
-                                    prior[2] *= -1.
                                 
                             if 'auto' in prior[3]:
                                 
-                                prior[3] = 1.0
-
-                                if 'absorption' in comp_typ:
-
-                                    prior[3] *= -1.
+                                prior[3] = 1.e2 # A large optical depth value
 
                         else:
 
                             if 'auto' in prior[2]:
 
-                                if 'absorption' in comp_typ:
-                                    if source.info['flux'] > float(options.flux_limit):
-                                        prior[2] = -1.0*float(options.flux_limit)
-                                    else:
-                                        prior[2] = -1.0*float(source.info['flux'])    
-
-                                elif 'emission' in comp_typ:
                                     prior[2] = 1.e-2*np.min(source.spectrum.y.sigma)
 
                             if 'auto' in prior[3]:
 
                                 if 'absorption' in comp_typ:
-                                    prior[3] = -1.e-2*np.min(source.spectrum.y.sigma)
+                                    if source.info['flux'] > float(options.flux_limit):
+                                        prior[3] = float(options.flux_limit)
+                                    else:
+                                        prior[3] = float(source.info['flux'])   
 
                                 elif 'emission' in comp_typ:
                                     prior[3] = float(options.flux_limit)

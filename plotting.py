@@ -16,11 +16,11 @@ def bestfit_spectrum(options,source,model):
     constants = Constants()
 
     # Loop over number of detections
-    i = 0
+    mode_index = 0
     for mode in model.output.sline.get_mode_stats()['modes']:
 
         # If no detections skip further iterations
-        if (model.output.ndetections == 0) and (i > 0):
+        if (model.output.ndetections == 0) and (mode_index > 0):
             continue
 
         # Calculate mode evidence
@@ -42,20 +42,20 @@ def bestfit_spectrum(options,source,model):
             rest_z = shift_frame(source.spectrum.x.data,source.info['z'])
             x_data = zTOvel(rest_z,'relativistic')*constants.LIGHT_SPEED            
         elif options.plot_restframe == 'peak':
-            ind = model.input.all_ndims
-            count = 0.0
+            param_index = model.input.all_ndims
+            comp_index = 0.0
             shift_z = 0.0
             if model.output.ndetections == 0:
                 shift_z = 0.5*(source.spectrum.x.data[-1]+source.spectrum.x.data[0])
             else:
                 if 'emission' in model.input.types:
-                    shift_z += mode['maximum'][ind]
-                    count += 1.0
-                    ind += 4
+                    shift_z += mode['maximum'][param_index]
+                    comp_index += 1.0
+                    param_index += 4
                 if 'absorption' in model.input.types:
-                    shift_z += mode['maximum'][ind]
-                    count += 1.0
-                shift_z /= count
+                    shift_z += mode['maximum'][param_index]
+                    comp_index += 1.0
+                shift_z /= comp_index
                 if options.x_units == 'optvel':
                     shift_z /= constants.LIGHT_SPEED
             rest_z = shift_frame(source.spectrum.x.data,shift_z)
@@ -70,25 +70,25 @@ def bestfit_spectrum(options,source,model):
         y_contsub = np.copy(source.spectrum.y.data)
         y_res = np.copy(source.spectrum.y.data)
         y_line = []
-        comp_ind = 0
-        param_ind = 0
-        line_ind = 0        
+        comp_index = 0
+        param_index = 0
+        line_index = 0        
         for typ in model.input.types:
             comp = Model()
-            comp.input.priors = [np.copy(model.input.priors[comp_ind])]
+            comp.input.priors = [np.copy(model.input.priors[comp_index])]
             comp.input.types = [typ]
-            comp.input.models = [np.copy(model.input.models[comp_ind])]
+            comp.input.models = [np.copy(model.input.models[comp_index])]
             comp.input.tmp.x = np.copy(source.spectrum.x.fine)
             ndims = len(comp.input.priors[0])
-            comp.calculate_spectrum(options,source,mode['maximum'][param_ind:param_ind+ndims],ndims)
+            comp.calculate_spectrum(options,source,mode['maximum'][param_index:param_index+ndims],ndims)
             comp.calculate_data(options,source)
             y_res -= comp.output.tmp.data
             if 'continuum' in typ:
                 y_contsub -= comp.output.tmp.data
             elif (('emission' in typ) or ('absorption' in typ)) and (model.output.ndetections > 0):
                 y_line.append(comp.output.tmp.data)
-            param_ind += ndims
-            comp_ind += 1
+            param_index += ndims
+            comp_index += 1
         y_line = np.array(y_line)
 
         # If convert y-units
@@ -162,8 +162,8 @@ def bestfit_spectrum(options,source,model):
             for j in range(0, len(y_line)):
                 ax1.plot(x_data, y_line[j], color='g', linestyle='--',zorder=0)
                 truth = [np.abs(y_line[j])==np.max(np.abs(y_line[j]))]
-                comp_ind = np.where(ymax_sort == ymax[j])
-                ax1.text(x_data[truth]-1.*x_diff,np.max(y_contsub),'%d'%(comp_ind[0]+1),color='g',fontsize=font_size-2)
+                comp_index = np.where(ymax_sort == ymax[j])
+                ax1.text(x_data[truth]-1.*x_diff,np.max(y_contsub),'%d'%(comp_index[0]+1),color='g',fontsize=font_size-2)
 
         # Add evidence value to plot
         if model.output.ndetections != 0:
@@ -223,7 +223,7 @@ def bestfit_spectrum(options,source,model):
         # plt.savefig(options.out_root+'_line_'+str(line_number)+'_bestfit_spectrum.eps')
 
         # Increment
-        i += 1
+        mode_index += 1
 
 # Make posterior plots of model component and derived parameters
 def posterior_plot(options,source,model):
@@ -233,8 +233,8 @@ def posterior_plot(options,source,model):
         return
 
     # Loop over detection modes
-    mode_count = 0
-    plot_count = 0
+    mode_index = 0
+    plot_index = 0
     if options.mmodal:
         posterior_list = model.output.sline.get_separated_stats().separated_posterior
     else:
@@ -243,7 +243,7 @@ def posterior_plot(options,source,model):
     for posterior in posterior_list:
 
         # Calculate mode evidence
-        mode = model.output.sline.get_mode_stats()['modes'][mode_count]
+        mode = model.output.sline.get_mode_stats()['modes'][mode_index]
         mode_evidence = mode['local log-evidence']
         mode_evidence_err =  mode['local log-evidence error']
         if 'continuum' in model.input.types:
@@ -252,7 +252,7 @@ def posterior_plot(options,source,model):
 
         # If mode evidence less than zero then move to next iteration
         if (mode_evidence < options.detection_limit):
-            mode_count += 1
+            mode_index += 1
             continue
 
         # Initialize indexing
@@ -286,7 +286,7 @@ def posterior_plot(options,source,model):
             fig.tight_layout()
 
             # Save figure to file
-            fig.savefig(options.out_root+'_line_'+str(i+1)+'_emission_posterior.pdf')
+            fig.savefig(options.out_root+'_line_'+str(plot_index+1)+'_emission_posterior.pdf')
 
             offset_ind += 4
 
@@ -306,7 +306,7 @@ def posterior_plot(options,source,model):
             # labels = [label_1,label_2,label_3,label_4,label_5,label_6]
             labels = [label_1,label_4,label_5,label_6]            
 
-            #xs = np.array(model.out.line.params.samples[i][:,offset_ind:offset_ind+6])
+            #xs = np.array(model.out.line.params.samples[mode_index][:,offset_ind:offset_ind+6])
             xs = np.array(posterior[:,[offset_ind+0,offset_ind+3,offset_ind+4,offset_ind+5]])
             weights = np.array(posterior[:,0])
             fig = corner.corner(xs, 
@@ -322,9 +322,9 @@ def posterior_plot(options,source,model):
             fig.tight_layout()
 
             # Save figure to file
-            fig.savefig(options.out_root+'_line_'+str(plot_count+1)+'_absorption_posterior.pdf')
+            fig.savefig(options.out_root+'_line_'+str(plot_index+1)+'_absorption_posterior.pdf')
 
         # Increment
-        mode_count += 1
-        plot_count += 1
+        mode_index += 1
+        plot_index += 1
 

@@ -15,19 +15,19 @@ def initialize_resultsfile(options,model):
     text = '#Name ModeNum'
 
     # Add model component parameters
-    ind = 0
+    index = 0
     for comp in model.input.types:
 
         # Loop over model priors
-        for prior in model.input.priors[ind]:
+        for prior in model.input.priors[index]:
 
             if options.param_out == 'maxl':
-                text += ' %s_%d_maxl' % (prior[0],ind+1)
+                text += ' %s_%d_maxl' % (prior[0],index+1)
             else:
-                text += ' %s_%d_median %s_%d_siglo %s_%d_sighi' % (prior[0],ind+1,
-                                            prior[0],ind+1, prior[0],ind+1)
+                text += ' %s_%d_median %s_%d_siglo %s_%d_sighi' % (prior[0],index+1,
+                                            prior[0],index+1, prior[0],index+1)
 
-        ind += 1
+        index += 1
 
     # Add emission parameters
     if 'emission' in model.input.types:
@@ -65,11 +65,12 @@ def write_resultsfile(options,source,model):
     f = open(results_file, 'a')
         
     # Loop over detection modes
-    i = 0
+    mode_index = 0
+    print_index = 0
     for mode in model.output.sline.get_mode_stats()['modes']:
 
         # If no detections skip further iterations
-        if (model.output.ndetections == 0) and (i > 0):
+        if (model.output.ndetections == 0) and (mode_index > 0):
             continue
 
         # Calculate mode evidence
@@ -81,33 +82,34 @@ def write_resultsfile(options,source,model):
 
         # If mode evidence less than zero then move to next iteration
         if (model.output.ndetections > 0) and (mode_evidence < options.detection_limit):
+            mode_index += 1
             continue
 
         # Add source name and mode number
         if (model.output.ndetections == 0):
-            text = '%s %i' % (source.info['name'], i)
+            text = '%s %i' % (source.info['name'], print_index)
         else:
-            text = '%s %i' % (source.info['name'], i+1)
+            text = '%s %i' % (source.info['name'], print_index+1)
 
         # Loop over each model component
-        comp_ind = 0
-        param_ind = 0
+        comp_index = 0
+        param_index = 0
         for typ in model.input.types:
 
             # Set number of parameters for this component
-            nparams = len(model.input.priors[comp_ind])
+            nparams = len(model.input.priors[comp_index])
 
             # Add parameters for this component
             if model.output.ndetections == 0 and 'continuum' not in typ:
-                for j in range(param_ind,param_ind+nparams):
+                for j in range(param_index,param_index+nparams):
                     if options.param_out == 'maxl':
-                        text += ' .%8f' % (0.0)
+                        text += ' %.8f' % (0.)
                     else:
-                        text += ' %.8f %.8f %.8f' % (0.0,0.0,0.0)
-                comp_ind += 1
+                        text += ' %.8f %.8f %.8f' % (0.,0.,0.)
+                comp_index += 1
                 continue
             elif model.output.ndetections == 0:
-                for j in range(param_ind,param_ind+nparams):
+                for j in range(param_index,param_index+nparams):
                     if options.param_out == 'maxl':
                         maxl = model.output.cont.get_best_fit()['parameters'][j]
                         text += ' %.8f' % (maxl)
@@ -117,34 +119,34 @@ def write_resultsfile(options,source,model):
                         higher = model.output.cont.get_stats()['marginals'][j]['1sigma'][1]-median
                         text += ' %.8f %.8f %.8f' % (median,np.abs(lower),np.abs(higher))                        
             else:
-                for j in range(param_ind,param_ind+nparams):
+                for j in range(param_index,param_index+nparams):
                     if options.param_out == 'maxl':
-                        maxl = model.output.sline.get_stats()['modes'][i]['maximum'][j]
+                        maxl = model.output.sline.get_stats()['modes'][mode_index]['maximum'][j]
                         text += ' %.8f' % (maxl)
                     else:
                         if options.mmodal:
-                            median = model.output.sline.separated_stats['marginals'][i][j]['median']
-                            lower = model.output.sline.separated_stats['marginals'][i][j]['1sigma'][0]-median
-                            higher = model.output.sline.separated_stats['marginals'][i][j]['1sigma'][1]-median
+                            median = model.output.sline.separated_stats['marginals'][mode_index][j]['median']
+                            lower = model.output.sline.separated_stats['marginals'][mode_index][j]['1sigma'][0]-median
+                            higher = model.output.sline.separated_stats['marginals'][mode_index][j]['1sigma'][1]-median
                         else:
                             median = model.output.sline.get_stats()['marginals'][j]['median']
                             lower = model.output.sline.get_stats()['marginals'][j]['1sigma'][0]-median
                             higher = model.output.sline.get_stats()['marginals'][j]['1sigma'][1]-median
                         text += ' %.8f %.8f %.8f' % (median,np.abs(lower),np.abs(higher))
 
-            param_ind += nparams
-            comp_ind += 1
+            param_index += nparams
+            comp_index += 1
 
         # Add astrophysical quantities
         if model.output.ndetections == 0 :
             for j in range(model.input.all_ndims,model.input.nparams):
-                text += ' %.8f %.8f %.8f' % (0.0,0.0,0.0)
+                text += ' %.8f %.8f %.8f' % (0.,0.,0.)
         else:
             for j in range(model.input.all_ndims,model.input.nparams):
                 if options.mmodal:
-                    median = model.output.sline.separated_stats['marginals'][i][j]['median']
-                    lower = model.output.sline.separated_stats['marginals'][i][j]['1sigma'][0]-median
-                    higher = model.output.sline.separated_stats['marginals'][i][j]['1sigma'][1]-median
+                    median = model.output.sline.separated_stats['marginals'][mode_index][j]['median']
+                    lower = model.output.sline.separated_stats['marginals'][mode_index][j]['1sigma'][0]-median
+                    higher = model.output.sline.separated_stats['marginals'][mode_index][j]['1sigma'][1]-median
                 else:
                     median = model.output.sline.get_stats()['marginals'][j]['median']
                     lower = model.output.sline.get_stats()['marginals'][j]['1sigma'][0]-median
@@ -153,7 +155,7 @@ def write_resultsfile(options,source,model):
 
         # Add Bayesian Evidence and Chisquared statistics
         if model.output.ndetections == 0:
-            text += ' %g %g' % (0.0,0.0)
+            text += ' %g %g' % (0.,0.)
             if 'continuum' in typ:
                 loglhood = model.output.cont.get_best_fit()['log_likelihood']
             else:
@@ -162,7 +164,7 @@ def write_resultsfile(options,source,model):
         else:
             text += ' %g %g' % (mode_evidence, mode_evidence_err)
             if options.mmodal:
-                loglhood = model.output.sline.separated_stats['best_fit'][i]['log_likelihood']
+                loglhood = model.output.sline.separated_stats['best_fit'][mode_index]['log_likelihood']
             else:
                 loglhood = model.output.sline.get_best_fit()['log_likelihood']
         
@@ -174,7 +176,8 @@ def write_resultsfile(options,source,model):
         f.write(text)   
 
         # Increment
-        i += 1
+        mode_index += 1
+        print_index += 1
 
     f.close()
 
