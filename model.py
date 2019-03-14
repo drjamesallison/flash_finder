@@ -178,7 +178,7 @@ class Model():
                         if dx > self.output.tmp.dx_max_abs:
                             self.output.tmp.dx_max_abs = dx
 
-                    # Depth parameter
+                    # Peak parameter
                     if 'y0' in prior[0]:
                         y0 = cube[cube_ind]
                         if options.param_out == 'median':
@@ -224,9 +224,8 @@ class Model():
                     else:
                         line = y0*tmp/np.max(tmp)
 
-                # Convert from optical depth to absorbed flux
-                if options.y_units == 'opd':
-                    line = 1. - np.exp(-line)
+                # Convert from optical depth to absorbed flux fraction
+                line = 1. - np.exp(-line)
 
                 # Accumulate absorption component
                 self.output.tmp.abs += line
@@ -246,15 +245,8 @@ class Model():
             comp_ind += 1
         
         # Check for unphysical models
-        if np.any(self.output.tmp.cont < 0.0):
+        if np.any(self.output.tmp.cont < 0.) or np.any(self.output.tmp.abs > 1.):
             self.output.tmp.unphys = True
-        if 'continuum' in self.input.types and np.any(self.output.tmp.cont+self.output.tmp.abs) < 0:
-            self.output.tmp.unphys = True
-        if 'continuum' not in self.input.types:
-            if options.y_units != 'opd' and np.any(self.output.tmp.abs < -1*abs(source.info['flux'])):
-                self.output.tmp.unphys = True
-            elif options.y_units == 'opd' and np.any(self.output.tmp.abs < -1.0):
-                self.output.tmp.unphys = True
 
         return self
 
@@ -262,7 +254,16 @@ class Model():
     def calculate_data(self,options,source):
 
         # Calculate model data
-        self.output.tmp.data = self.output.tmp.cont + self.output.tmp.emi + self.output.tmp.abs
+        self.output.tmp.data = self.output.tmp.cont + self.output.tmp.emi
+
+        # Add absorption component to model data
+        abs_fact = 1.
+        if 'continuum' in self.input.types:
+            abs_fact = self.output.tmp.cont
+        elif options.y_units != 'opd':
+            abs_fact = source.info['flux']
+        self.output.tmp.data -= abs_fact*self.output.tmp.abs
+
 
         # Apply channel function
         if options.channel_function != 'none':
@@ -351,23 +352,9 @@ class Model():
             fabs = interpolate.interp1d(self.input.tmp.x, self.output.tmp.abs,
                     bounds_error=False, fill_value=0)
             abs_fine = fabs(x_fine)
-            fcont = interpolate.interp1d(self.input.tmp.x, self.output.tmp.cont,
-                    bounds_error=False, fill_value=0)
-            cont_fine = fcont(x_fine)
 
             # Calculate required properties
-            peak_dS = np.min(abs_fine)
-            if 'continuum' in self.input.types:
-                peak_Sc = np.mean(cont_fine[np.where(abs_fine == peak_dS)])
-                frac = np.abs(abs_fine/cont_fine)
-            else:
-                if options.y_units == 'opd':
-                    peak_Sc = 1.0
-                else:
-                    peak_Sc = source.info['flux']
-                frac = np.abs(abs_fine/peak_Sc)
-            frac[frac >= 1.0] = 0.999999
-            opd = np.abs(np.log(1-frac))
+            opd = -1.*np.log(1.-abs_fine)
             peak_opd = np.max(opd)
             if peak_opd == 0.0:
                 peak_z = 0.0
@@ -389,11 +376,9 @@ class Model():
 
             # Allocate cube 
             cube[ind] = np.round(peak_z,99)
-            cube[ind+1] = np.round(peak_dS,99)
-            cube[ind+2] = np.round(peak_Sc,99)
-            cube[ind+3] = np.round(peak_opd,99)
-            cube[ind+4] = np.round(int_opd,99)
-            cube[ind+5] = np.round(width,99)
+            cube[ind+1] = np.round(peak_opd,99)
+            cube[ind+2] = np.round(int_opd,99)
+            cube[ind+3] = np.round(width,99)
 
         return
 
@@ -491,35 +476,30 @@ class Input():
                                 elif options.x_units == 'optvel':
                                     prior[3] /= constants.LIGHT_SPEED
 
-                    # Set automated values for line depth/height prior
+                    # Set automated values for line peak prior
                     if 'y0' in prior[0]:
 
-                        if options.y_units == 'opd':                                         
+                        if 'auto' in prior[2]:
 
-                            if 'auto' in prior[2]:
+                            prior[2] = 1.e-2*np.min(source.spectrum.y.sigma)
 
-                                prior[2] = 1.e-2*np.min(source.spectrum.y.sigma)
-                                
-                            if 'auto' in prior[3]:
-                                
+                            if ('absorption' in comp_typ) and (options.y_units != 'opd') and (float(source.info['flux']) != 0):
+
+                                    prior[2] /= float(source.info['flux'])
+                                    
+                        if 'auto' in prior[3]:
+
+                            if 'absorption' in comp_typ:
+
                                 prior[3] = 1.e2 # A large optical depth value
 
-                        else:
+                                if (options.y_units != 'opd') and (float(source.info['flux']) > float(options.flux_limit)):
+                                        
+                                        prior[3] = -1.*np.log(1.-float(options.flux_limit)/float(source.info['flux']))
 
-                            if 'auto' in prior[2]:
-
-                                    prior[2] = 1.e-2*np.min(source.spectrum.y.sigma)
-
-                            if 'auto' in prior[3]:
-
-                                if 'absorption' in comp_typ:
-                                    if source.info['flux'] > float(options.flux_limit):
-                                        prior[3] = float(options.flux_limit)
-                                    else:
-                                        prior[3] = float(source.info['flux'])   
-
-                                elif 'emission' in comp_typ:
-                                    prior[3] = float(options.flux_limit)
+                            elif 'emission' in comp_typ:
+                                
+                                prior[3] = float(options.flux_limit)
 
                     # Set automated values for Busy function steepness parameter
                     if 'busyb' in prior[0]:
@@ -580,7 +560,7 @@ class Input():
         if 'emission' in self.types:
             self.nparams += 4
         if 'absorption' in self.types:
-            self.nparams += 6
+            self.nparams += 4
 
         return self
 

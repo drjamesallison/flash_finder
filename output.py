@@ -44,9 +44,7 @@ def initialize_resultsfile(options,model):
         if options.x_units == 'optvel':
             text += ' abs_peakz_median(km/s) abs_peakz_siglo(km/s) abs_peakz_sighi(km/s)'
         else:
-            text += ' abs_peakz_median abs_peakz_siglo abs_peakz_sighi'            
-        text += ' abs_peakdS_median(mJy) abs_peakdS_siglo(mJy) abs_peakdS_sighi(mJy)'
-        text += ' abs_peakSc_median(mJy) abs_peakSc_siglo(mJy) abs_peakSc_sighi(mJy)'                
+            text += ' abs_peakz_median abs_peakz_siglo abs_peakz_sighi'                         
         text += ' abs_peakopd_median abs_peakopd_siglo abs_peakopd_sighi'
         text += ' abs_intopd_median(km/s) abs_intopd_siglo(km/s) abs_intopd_sighi(km/s)'
         text += ' abs_width_median(km/s) abs_width_siglo(km/s) abs_width_sighi(km/s)'

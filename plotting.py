@@ -218,7 +218,7 @@ def bestfit_spectrum(options,source,model):
         if model.output.ndetections == 0:
             line_number = 0
         else:
-            line_number = i+1
+            line_number = mode_index+1
         plt.savefig(options.out_root+'_line_'+str(line_number)+'_bestfit_spectrum.pdf')
         # plt.savefig(options.out_root+'_line_'+str(line_number)+'_bestfit_spectrum.eps')
 
@@ -256,10 +256,10 @@ def posterior_plot(options,source,model):
             continue
 
         # Initialize indexing
-        offset_ind = 2
+        offset_index = 2
 
         # Make plot of emission parameters 
-        offset_ind += model.input.all_ndims
+        offset_index += model.input.all_ndims
         if 'emission' in model.input.types:
             
             if options.x_units == 'optvel':
@@ -271,7 +271,7 @@ def posterior_plot(options,source,model):
             label_4 = r'$\Delta{v}_\mathrm{eff}\,[\mathrm{km}\,\mathrm{s}^{-1}]$'
             labels = [label_1,label_2,label_3,label_4]
 
-            xs = np.array(posterior[:,offset_ind:offset_ind+4])
+            xs = np.array(posterior[:,offset_index:offset_index+4])
             weights = np.array(posterior[:,0])
             fig = corner.corner(xs, 
                             weights=weights,
@@ -288,7 +288,7 @@ def posterior_plot(options,source,model):
             # Save figure to file
             fig.savefig(options.out_root+'_line_'+str(plot_index+1)+'_emission_posterior.pdf')
 
-            offset_ind += 4
+            offset_index += 4
 
         # Make plot of absorption parameters  
         if 'absorption' in model.input.types:
@@ -297,17 +297,12 @@ def posterior_plot(options,source,model):
                 label_1 = r'$v_\mathrm{peak}\,\mathrm{[km\,s^{-1}]}$'
             else:
                 label_1 = r'$z_\mathrm{peak}$'
-            # label_2 = r'$\Delta{S}_\mathrm{peak}\,\mathrm{[mJy]}$'
-            # label_2 = r'$\Delta{S}_\mathrm{peak}/S_\mathrm{cont}$'
-            # label_3 = r'$S_\mathrm{cont}\,\mathrm{[mJy]}$'
-            label_4 = r'$\tau_\mathrm{peak}$'            
-            label_5 = r'$\int\tau\,\mathrm{d}v\,\mathrm{[\mathrm{km}\,\mathrm{s}^{-1}]}$'
-            label_6 = r'$\Delta{v}_\mathrm{eff}\,[\mathrm{km}\,\mathrm{s}^{-1}]$'            
-            # labels = [label_1,label_2,label_3,label_4,label_5,label_6]
-            labels = [label_1,label_4,label_5,label_6]            
+            label_2 = r'$\tau_\mathrm{peak}$'            
+            label_3 = r'$\int\tau\,\mathrm{d}v\,\mathrm{[\mathrm{km}\,\mathrm{s}^{-1}]}$'
+            label_4 = r'$\Delta{v}_\mathrm{eff}\,[\mathrm{km}\,\mathrm{s}^{-1}]$'            
+            labels = [label_1,label_2,label_3,label_4]            
 
-            #xs = np.array(model.out.line.params.samples[mode_index][:,offset_ind:offset_ind+6])
-            xs = np.array(posterior[:,[offset_ind+0,offset_ind+3,offset_ind+4,offset_ind+5]])
+            xs = np.array(posterior[:,[offset_index+0,offset_index+1,offset_index+2,offset_index+3]])
             weights = np.array(posterior[:,0])
             fig = corner.corner(xs, 
                             weights=weights,
