@@ -45,13 +45,13 @@ if options.mpi_switch:
 # Determine if CPU should do the following
 if (mpi_rank == 0) or (not options.init_MPI):
     
-    print '\n\n******************************************************************************'
-    print '                                 FLASH FINDER'
-    print ''
-    print 'Python program to use MultiNest for spectral-line detection and modelling'
-    print ''
-    print 'Copyright 2018 James R. Allison. All rights reserved.'
-    print '******************************************************************************\n'
+    print('\n\n******************************************************************************')
+    print('                                 FLASH FINDER')
+    print('')
+    print('Python program to use MultiNest for spectral-line detection and modelling')
+    print('')
+    print('Copyright 2018 James R. Allison. All rights reserved.')
+    print('******************************************************************************\n')
 
     # Read source information from file
     if (mpi_rank == 0):
@@ -60,7 +60,7 @@ if (mpi_rank == 0) or (not options.init_MPI):
 
         # Check for required information
         if 'name' not in source_list.colnames:
-            print "\nCPU %d:Please specify source names in %s\n" % (mpi_rank,options.data_path+'sources.log')
+            print(\nCPU %d:Please specify source names in %s\n' % (mpi_rank,options.data_path+'sources.log'))
             sys.exit(1)
 
     # Distribute source list amongst processors
@@ -86,7 +86,7 @@ if (mpi_rank == 0) or (not options.init_MPI):
 
     # Initialize output results file
     if (mpi_rank == 0):
-        print "\nCPU %d: Initializing output results file.\n" % (mpi_rank)
+        print('\nCPU %d: Initializing output results file.\n'% (mpi_rank))
         source = Source()
         model = Model()
         model.input.generate_model(options,source)
@@ -111,7 +111,7 @@ if (mpi_rank == 0) or (not options.init_MPI):
         source.info = line
 
         # Report source name 
-        print "\nCPU %d: Working on Source %s.\n" % (mpi_rank,source.info['name'])
+        print('\nCPU %d: Working on Source %s.\n'% (mpi_rank,source.info['name']))
 
         # Assign output root name
         options.out_root = '%s/%s'%(options.out_path,source.info['name'])
@@ -121,7 +121,7 @@ if (mpi_rank == 0) or (not options.init_MPI):
         if os.path.exists(source.spectrum.filename):           
             source.spectrum.generate_data(options)
         else:
-            print "\nCPU %d: Spectrum for source %s does not exist. Moving on.\n" % (mpi_rank,source.info['name'])
+            print('\nCPU %d: Spectrum for source %s does not exist. Moving on.\n'% (mpi_rank,source.info['name']))
             continue
 
         # Initialize and generate model object
@@ -141,7 +141,7 @@ if (mpi_rank == 0) or (not options.init_MPI):
         if 'continuum' in model.input.types:
 
             # Print message to screen
-            print "\nCPU %d: Started MultiNest for continuum model\n" % (mpi_rank)
+            print('\nCPU %d: Started MultiNest for continuum model\n' % (mpi_rank))
 
             # Run pymultinest
             mnest_args['n_dims'] = model.input.cont_ndims
@@ -152,7 +152,7 @@ if (mpi_rank == 0) or (not options.init_MPI):
             pymultinest.run(**mnest_args)
 
             # Print message to screen
-            print "\nCPU %d: Finished MultiNest for continuum model\n" % (mpi_rank)
+            print('\nCPU %d: Finished MultiNest for continuum model\n' % (mpi_rank))
 
             # Obtain output
             model.output.cont = pymultinest.Analyzer(n_params=mnest_args['n_params'],outputfiles_basename=mnest_args['outputfiles_basename'])
@@ -163,7 +163,7 @@ if (mpi_rank == 0) or (not options.init_MPI):
         # Run habs nest to fit for spectral-lines
 
         # Print message to screen
-        print "\nCPU %d: Started MultiNest for spectral line model\n" % (mpi_rank)
+        print('\nCPU %d: Started MultiNest for spectral line model\n' % (mpi_rank))
 
         # Run pymultinest
         mnest_args['n_dims'] = model.input.all_ndims
@@ -176,7 +176,7 @@ if (mpi_rank == 0) or (not options.init_MPI):
         pymultinest.run(**mnest_args)
 
         # Print message to screen
-        print "\nCPU %d: Finished MultiNest for spectral line model\n" % (mpi_rank)
+        print('\nCPU %d: Finished MultiNest for spectral line model\n' % (mpi_rank))
 
         # Obtain output
         pymultinest.Analyzer.get_separated_stats = get_separated_stats
@@ -191,9 +191,9 @@ if (mpi_rank == 0) or (not options.init_MPI):
             if mode_evidence >= options.detection_limit:
                 model.output.ndetections += 1
         if model.output.ndetections == 1:
-            print '\nCPU %d, Source %s: 1 spectral line detected\n' % (mpi_rank,source.info['name'])
+            print('\nCPU %d, Source %s: 1 spectral line detected\n' % (mpi_rank,source.info['name']))
         else:
-            print '\nCPU %d, Source %s: %d spectral lines detected\n' % (mpi_rank,source.info['name'],model.output.ndetections)
+            print('\nCPU %d, Source %s: %d spectral lines detected\n' % (mpi_rank,source.info['name'],model.output.ndetections))
 
         # Write results to file
         write_resultsfile(options,source,model)
@@ -201,7 +201,7 @@ if (mpi_rank == 0) or (not options.init_MPI):
         # Make grahpical output
         if options.plot_switch:
             from plotting import *
-            print 'CPU %d, Source %s: Making graphical output\n' % (mpi_rank,source.info['name'])
+            print('CPU %d, Source %s: Making graphical output\n' % (mpi_rank,source.info['name']))
 
             # Make plot of posterior probabilities for absorption parameters
             posterior_plot(options,source,model)
