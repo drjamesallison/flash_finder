@@ -21,10 +21,10 @@ module use /group/askap/jallison/pymultinest/modulefiles
 module load pymultinest
 module use /group/askap/jallison/corner/modulefiles
 module load corner
+module use /group/askap/jallison/flash_finder/modulefiles
+module load flash_finder
 
 export MPICH_GNI_MALLOC_FALLBACK=enabled
-export FINDER=$ACES/UserScripts/jallison/flash_finder
-export MATPLOTLIBRC=$FINDER/matplotlib/
 
 srun --export=ALL --ntasks=20 --ntasks-per-node=20 python $FINDER/flash_finder.py \
 --x_units 'optvel' \
