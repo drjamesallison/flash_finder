@@ -1,6 +1,6 @@
-# flash_finder
+# FLASHfinder
 
-Copyright James R Allison 2018
+Copyright James R Allison 2020
 
 If you publish results that have been derived with the help of this software, I would appreciate a reference to the original paper describing the application:
 
