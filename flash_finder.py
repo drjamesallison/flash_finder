@@ -60,7 +60,7 @@ if (mpi_rank == 0) or (not options.init_MPI):
 
         # Check for required information
         if 'name' not in source_list.colnames:
-            print(\nCPU %d:Please specify source names in %s\n' % (mpi_rank,options.data_path+'sources.log'))
+            print('\nCPU %d:Please specify source names in %s\n' % (mpi_rank,options.data_path+'sources.log'))
             sys.exit(1)
 
     # Distribute source list amongst processors
