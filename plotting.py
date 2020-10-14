@@ -92,7 +92,7 @@ def bestfit_spectrum(options,source,model):
         y_line = np.array(y_line)
 
         # If convert y-units
-        if options.y_units == 'opd':
+        if options.y_units == 'abs':
             y_contsub *= 100.0
             y_res *= 100.0
             y_line *= 100.0
@@ -197,7 +197,7 @@ def bestfit_spectrum(options,source,model):
         if (options.y_units == 'mJy/beam') or (options.y_units == 'Jy/beam'):
             ylabh = ax1.set_ylabel(r"$S\,[\mathrm{mJy}\,\mathrm{beam}^{-1}]$", fontsize=font_size)
             # ylabh = ax1.set_ylabel(r"$S\,[\mathrm{Jy}\,\mathrm{beam}^{-1}]$", fontsize=font_size)
-        elif options.y_units == 'opd':
+        elif options.y_units == 'abs':
             # ylabh = ax1.set_ylabel(r'$e^{-\tau}-1 [\mathrm{per}\,\mathrm{cent}]$', fontsize=font_size)
             ylabh = ax1.set_ylabel(r"$\Delta{S}/S_\mathrm{c} [\mathrm{per}\,\mathrm{cent}]$", fontsize=font_size)            
             # ylabh = ax1.set_ylabel(r"$\mathrm{Absorbed}\,\mathrm{Fraction}\,[\mathrm{per}\,\mathrm{cent}]$", fontsize=font_size)

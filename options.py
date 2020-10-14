@@ -74,8 +74,8 @@ parser.add_argument('--x_min', default=-1.e99, type=float,
                     help='minimum value for x-axis')
 parser.add_argument('--x0_sigma', default=50, type=float,
                     help='sigma width when using a normal prior for x0 (use same units as supplied source redshift)')
-parser.add_argument('--y_units', choices = ['mJy','mJy/beam','Jy','Jy/beam','opd'], default='mJy', type=str,
-                    help='units for the spectral y-axis (mJy, mJy/beam, Jy, Jy/beam or optical depth)')
+parser.add_argument('--y_units', choices = ['mJy','mJy/beam','Jy','Jy/beam','abs'], default='mJy', type=str,
+                    help='units for the spectral y-axis (mJy, mJy/beam, Jy, Jy/beam or absorbed fraction)')
 parser.add_argument('--ylim_scale', default=1.5, type=float,
                     help='y-axis scaling in plots')
 options = parser.parse_args()

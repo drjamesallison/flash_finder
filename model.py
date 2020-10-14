@@ -260,7 +260,7 @@ class Model():
         abs_fact = 1.
         if 'continuum' in self.input.types:
             abs_fact = self.output.tmp.cont
-        elif options.y_units != 'opd':
+        elif options.y_units != 'abs':
             abs_fact = source.info['flux']
         self.output.tmp.data -= abs_fact*self.output.tmp.abs
 
@@ -483,7 +483,7 @@ class Input():
 
                             prior[2] = 1.e-2*np.min(source.spectrum.y.sigma)
 
-                            if ('absorption' in comp_typ) and (options.y_units != 'opd') and (float(source.info['flux']) != 0):
+                            if ('absorption' in comp_typ) and (options.y_units != 'abs') and (float(source.info['flux']) != 0):
 
                                     prior[2] /= float(source.info['flux'])
                                     
@@ -493,7 +493,7 @@ class Input():
 
                                 prior[3] = 1.e2 # A large optical depth value
 
-                                if (options.y_units != 'opd') and (float(source.info['flux']) > float(options.flux_limit)):
+                                if (options.y_units != 'abs') and (float(source.info['flux']) > float(options.flux_limit)):
                                         
                                         prior[3] = -1.*np.log(1.-float(options.flux_limit)/float(source.info['flux']))
 
