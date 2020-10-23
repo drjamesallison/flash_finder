@@ -87,7 +87,7 @@ class Model():
                         x0 = cube[cube_ind]
                         if x0 < self.output.tmp.x0_min_emi:
                             self.output.tmp.x0_min_emi = x0
-                        if x0 > out.tmp.x0_max_emi:
+                        if x0 > self.output.tmp.x0_max_emi:
                             self.output.tmp.x0_max_emi = x0
 
                     # Width parameter
@@ -95,7 +95,7 @@ class Model():
                         dx = cube[cube_ind]
                         if dx < self.output.tmp.dx_min_emi:
                             self.output.tmp.dx_min_emi = dx
-                        if dx > out.tmp.dx_max_emi:
+                        if dx > self.output.tmp.dx_max_emi:
                             self.output.tmp.dx_max_emi = dx
 
                     # Peak parameter
@@ -462,19 +462,11 @@ class Input():
 
                             if 'source' in prior[2]:
                                 prior[2] = source.info['z']
-                                if options.x_units == 'frequency':
-                                    prior[2] = freqTOz(prior[2], options.rest_frequency)
-                                elif options.x_units == 'optvel':
-                                    prior[2] /= constants.LIGHT_SPEED
 
                             if 'auto' in prior[3]:
                                 prior[3] = options.x0_sigma
                             elif 'source' in prior[3]:
-                                prior[3] = source.info['z']
-                                if options.x_units == 'frequency':
-                                    prior[3] = freqTOz(prior[3], options.rest_frequency)
-                                elif options.x_units == 'optvel':
-                                    prior[3] /= constants.LIGHT_SPEED
+                                prior[3] = source.info['e_z']
 
                     # Set automated values for line peak prior
                     if 'y0' in prior[0]:
