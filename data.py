@@ -49,6 +49,7 @@ class Spectrum():
             sigma_rough = std_madfm(filtered)
             clipped = filtered[np.abs(filtered-np.median(filtered))<=3.0*sigma_rough]
             self.y.sigma = std_madfm(clipped)*np.ones(self.y.data.shape)
+            print('noise = %g'%self.y.sigma[0])
         self.y.sigma *= options.noise_factor
 
         self.ndata = len(self.x.data)

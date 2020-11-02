@@ -1,11 +1,11 @@
-/usr/bin/env $FINDER/flash_finder.py \
+/usr/bin/env python $FINDER/flash_finder.py \
 --x_units 'optvel' \
 --y_units 'mJy' \
---out_path $FINDER'/example/chains' \
---data_path $FINDER'/example/data/' \
+--out_path $FINDER'/examples/chains' \
+--data_path $FINDER'/examples/data/' \
 --nlive 500 \
 --channel_function 'none' \
---channel_path $FINDER'/example/data/hipass_channel.dat' \
+--channel_path $FINDER'/examples/data/hipass_channel.dat' \
 --plot_restframe 'none' \
 --noise_factor '1.00' \
 --x0_sigma '200' \

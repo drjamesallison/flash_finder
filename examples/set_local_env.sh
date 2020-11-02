@@ -1,6 +1,5 @@
 # Set path to FLASH FINDER
-ACES=$HOME/software/ACES/
-FINDER=$ACES/flash_finder/ 
+FINDER=$HOME/software/flash_finder/ 
 export FINDER
 
 # Set path to MULTINEST
