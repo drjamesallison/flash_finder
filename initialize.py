@@ -4,10 +4,8 @@ from fitting import *
 
 # Initialise required directories
 def initialize_directories(options):
-    if not os.path.exists(options.data_path):
-        os.makedirs('%s'%options.data_path)
-    if not os.path.exists(options.out_path):
-        os.makedirs('%s'%options.out_path)
+    os.makedirs('%s'%options.data_path, exist_ok=True)
+    os.makedirs('%s'%options.out_path, exist_ok=True)
 
 # Create list of file info objects for files of particular extensions
 def listDirectory(directory, fileExtList):
