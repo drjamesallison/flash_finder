@@ -28,6 +28,8 @@ parser.add_argument('--init_MPI', action='store_true', default=False,
                     help='use MPI in MultiNest')
 parser.add_argument('--invert_spectra', action='store_true', default=False,
                     help='invert input spectra')
+parser.add_argument('--mask_path', default=os.getcwd()+'/mask.txt', type=str,
+                    help='full path to data mask file')
 parser.add_argument('--mmodal', action='store_true', default=False,
                     help='mmodal parameter used in MultiNest')
 parser.add_argument('--model_path', default=os.getcwd()+'/model.txt', type=str,

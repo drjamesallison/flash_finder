@@ -37,6 +37,14 @@ class Spectrum():
         self.y.data = data[:,1][(data[:,0]>=float(options.x_min))&(data[:,0]<=float(options.x_max))] 
         self.y.data = data[:,1][(data[:,0]>=float(options.x_min))&(data[:,0]<=float(options.x_max))]         
 
+        # Apply mask file
+        if os.path.exists(options.mask_file):
+            masks = np.genfromtxt(options.mask_file, comments='#')
+            for mask in masks:
+                low_edge = np.min(mask)
+                high_edge = np.max(mask)
+                self.y.data[(self.y.data > low_edge) & (self.y.data < high_edge)] = 0.
+
         # Invert data if required
         if options.invert_spectra:
             self.y.data = -1*self.y.data
