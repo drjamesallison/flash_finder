@@ -38,8 +38,8 @@ class Spectrum():
         self.y.data = data[:,1][(data[:,0]>=float(options.x_min))&(data[:,0]<=float(options.x_max))]         
 
         # Apply mask file
-        if os.path.exists(options.mask_file):
-            masks = np.genfromtxt(options.mask_file, comments='#')
+        if os.path.exists(options.mask_path):
+            masks = np.genfromtxt(options.mask_path, comments='#')
             for mask in masks:
                 low_edge = np.min(mask)
                 high_edge = np.max(mask)
