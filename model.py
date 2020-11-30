@@ -17,16 +17,16 @@ class Model():
         # Intialize continuum, emission and absorption components
         self.output.tmp.cont = np.zeros(len(self.input.tmp.x))
         self.output.tmp.emi = np.zeros(len(self.input.tmp.x))
-        self.output.tmp.abs = np.zeros(len(self.input.tmp.x))
+        self.output.tmp.opd = np.zeros(len(self.input.tmp.x))
         self.output.tmp.cal = 1.0
         self.output.tmp.x0_min_emi = 1.e99
         self.output.tmp.x0_max_emi = 0.0
         self.output.tmp.dx_min_emi = 1.e99
         self.output.tmp.dx_max_emi = 0.0
-        self.output.tmp.x0_min_abs = 1.e99
-        self.output.tmp.x0_max_abs = 0.0
-        self.output.tmp.dx_min_abs = 1.e99
-        self.output.tmp.dx_max_abs = 0.0
+        self.output.tmp.x0_min_opd = 1.e99
+        self.output.tmp.x0_max_opd = 0.0
+        self.output.tmp.dx_min_opd = 1.e99
+        self.output.tmp.dx_max_opd = 0.0
 
         # Initialize constants object
         from initialize import Constants
@@ -224,11 +224,8 @@ class Model():
                     else:
                         line = y0*tmp/np.max(tmp)
 
-                # Convert from optical depth to absorbed flux fraction
-                line = 1. - np.exp(-line)
-
                 # Accumulate absorption component
-                self.output.tmp.abs += line
+                self.output.tmp.opd += line
 
             # Calibration component
             if 'calibration' in self.input.types[comp_ind]:
@@ -244,8 +241,8 @@ class Model():
             # Increment model component index
             comp_ind += 1
         
-        # Check for unphysical models
-        if np.any(self.output.tmp.cont < 0.) or np.any(self.output.tmp.abs > 1.):
+        # Check for unphysical model
+        if np.any(self.output.tmp.cont < 0.) or np.any((1.-np.exp(-1*self.output.tmp.opd)) > 1.):
             self.output.tmp.unphys = True
 
         return self
@@ -257,13 +254,12 @@ class Model():
         self.output.tmp.data = self.output.tmp.cont + self.output.tmp.emi
 
         # Add absorption component to model data
-        abs_fact = 1.
+        cont = 1.
         if 'continuum' in self.input.types:
-            abs_fact = self.output.tmp.cont
+            cont = self.output.tmp.cont
         elif options.y_units != 'abs':
-            abs_fact = source.info['flux']
-        self.output.tmp.data -= abs_fact*self.output.tmp.abs
-
+            cont = source.info['flux']
+        self.output.tmp.data -= cont*(1.-np.exp(-1*self.output.tmp.opd))
 
         # Apply channel function
         if options.channel_function != 'none':
@@ -349,26 +345,24 @@ class Model():
             x_fine = np.arange(min_fine,max_fine,dfine)
 
             # Interpolate spectral models to fine grid
-            fabs = interpolate.interp1d(self.input.tmp.x, self.output.tmp.abs,
+            fopd = interpolate.interp1d(self.input.tmp.x, self.output.tmp.opd,
                     bounds_error=False, fill_value=0)
-            abs_fine = fabs(x_fine)
+            opd_fine = fopd(x_fine)
 
             # Calculate required properties
-            opd = -1.*np.log(1.-abs_fine)
-            peak_opd = np.max(opd)
+            peak_opd = np.max(opd_fine)
             if peak_opd == 0.0:
                 peak_z = 0.0
                 mean_z = 0.0
                 int_opd = 0.0
                 width = 0.0
             else:
-                peak_z = np.mean(x_fine[opd == peak_opd])
-                mean_z = np.sum(opd*x_fine)/np.sum(opd)
-                rest_z = shift_frame(x_fine,mean_z)
+                peak_z = np.mean(x_fine[opd_fine == peak_opd])
+                mean_z = np.sum(opd_fine*x_fine)/np.sum(opd_fine)
+                rest_z = shift_frame(x_fine, mean_z)
                 rest_vel = zTOvel(rest_z, 'relativistic')
                 rest_vel *= constants.LIGHT_SPEED
-                int_opd = np.abs(integrate.simps(opd, rest_vel))
-                #int_opd = np.abs(integrate.simps(frac, rest_vel))
+                int_opd = np.abs(integrate.simps(opd_fine, rest_vel))
                 width = int_opd/peak_opd
             if options.x_units == 'optvel':
                 peak_z *= constants.LIGHT_SPEED
