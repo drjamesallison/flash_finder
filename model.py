@@ -165,18 +165,18 @@ class Model():
                     # Position parameter
                     if 'x0' in prior[0]:
                         x0 = cube[cube_ind]
-                        if x0 < self.output.tmp.x0_min_abs:
-                            self.output.tmp.x0_min_abs = x0
-                        if x0 > self.output.tmp.x0_max_abs:
-                            self.output.tmp.x0_max_abs = x0
+                        if x0 < self.output.tmp.x0_min_opd:
+                            self.output.tmp.x0_min_opd = x0
+                        if x0 > self.output.tmp.x0_max_opd:
+                            self.output.tmp.x0_max_opd = x0
 
                     # Width parameter
                     if 'dx' in prior[0]:
                         dx = cube[cube_ind]
-                        if dx < self.output.tmp.dx_min_abs:
-                            self.output.tmp.dx_min_abs = dx
-                        if dx > self.output.tmp.dx_max_abs:
-                            self.output.tmp.dx_max_abs = dx
+                        if dx < self.output.tmp.dx_min_opd:
+                            self.output.tmp.dx_min_opd = dx
+                        if dx > self.output.tmp.dx_max_opd:
+                            self.output.tmp.dx_max_opd = dx
 
                     # Peak parameter
                     if 'y0' in prior[0]:
@@ -336,12 +336,12 @@ class Model():
         if 'absorption' in self.input.types:
 
             # Set fine grid  
-            dfine = self.output.tmp.dx_min_abs/10.0
+            dfine = self.output.tmp.dx_min_opd/10.0
             dfine /= constants.LIGHT_SPEED
-            fine_lim = 2.0*self.output.tmp.dx_max_abs
+            fine_lim = 2.0*self.output.tmp.dx_max_opd
             fine_lim /= constants.LIGHT_SPEED
-            min_fine = self.output.tmp.x0_min_abs - fine_lim
-            max_fine = self.output.tmp.x0_max_abs + fine_lim
+            min_fine = self.output.tmp.x0_min_opd - fine_lim
+            max_fine = self.output.tmp.x0_max_opd + fine_lim
             x_fine = np.arange(min_fine,max_fine,dfine)
 
             # Interpolate spectral models to fine grid
