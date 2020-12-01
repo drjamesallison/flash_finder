@@ -563,7 +563,6 @@ class Output():
 # Define null statistic class 
 class Null():
     def __init__(self):
-        self.loglhood0 = -1.e999
         self.logZ = -1.e999
 
 # Define measured qauntity class

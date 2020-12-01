@@ -41,9 +41,7 @@ class Spectrum():
         if os.path.exists(options.mask_path):
             masks = np.genfromtxt(options.mask_path, comments='#')
             for mask in masks:
-                low_edge = np.min(mask)
-                high_edge = np.max(mask)
-                self.y.data[(self.y.data > low_edge) & (self.y.data < high_edge)] = 0.
+                self.y.data[(self.y.data > np.min(mask)) & (self.y.data < np.max(mask))] = 0.
 
         # Invert data if required
         if options.invert_spectra:
@@ -51,7 +49,7 @@ class Spectrum():
 
         # Calculate noise level
         if (np.size(data,1) > 2) and (not options.std_madfm):
-            self.y.sigma = data[:,2]
+            self.y.sigma = np.abs(data[:,2])
         else:
             filtered = self.y.data[~np.isnan(self.y.data) & (self.y.data!=0.0)]
             sigma_rough = std_madfm(filtered)

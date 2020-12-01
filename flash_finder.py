@@ -131,8 +131,7 @@ if (mpi_rank == 0) or (not options.init_MPI):
         # Calculate the null evidence
         empty = np.zeros(source.spectrum.ndata)
         chisq = calculate_chisquared(options,source.spectrum,empty)
-        model.output.null.loglhood0 = calculate_loglhood0(options,source.spectrum,empty)
-        model.output.null.logZ = model.output.null.loglhood0 - 0.5*chisq
+        model.output.null.logZ = -0.5*chisq
 
         # Initialize MultiNest arguments
         mnest_args = initialize_mnest(options,source,model)

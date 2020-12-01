@@ -14,15 +14,6 @@ def calculate_chisquared(options,data,model):
 
     return chisq
 
-# Calculate the log-likelihood constant
-def calculate_loglhood0(options,data,model):
-    loglhood0 = -0.5*data.ndata*np.log(2*np.pi)
-    if options.corr_switch:
-        loglhood0 += -0.5*data.y.logdetcov
-    else:
-        loglhood0 += -np.sum(np.log(data.y.sigma))
-    return loglhood0
-
 # Prior function supplied to MultiNest
 def PriorGen(options,model):
     def Prior(cube,ndim,nparams):
@@ -98,7 +89,7 @@ def LogLGen(options,source,model):
         chisq = calculate_chisquared(options,source.spectrum,model.output.tmp.data)   
         
         # Calculate log-likelihood
-        lnew = model.output.null.loglhood0 - 0.5*chisq
+        lnew = -0.5*chisq
         lnew -= model.output.null.logZ
         
         return lnew

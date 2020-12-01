@@ -167,7 +167,7 @@ def write_resultsfile(options,source,model):
                 loglhood = model.output.sline.get_best_fit()['log_likelihood']
         
         nfreedegs = len(source.spectrum.x.data)-model.input.all_ndims
-        mode_chisq = -2.*(loglhood+model.output.null.logZ-model.output.null.loglhood0)/(nfreedegs)
+        mode_chisq = -2.*(loglhood+model.output.null.logZ)/(nfreedegs)
         mode_chisq_err = np.sqrt(2./float(len(source.spectrum.x.data)))
         text += ' %g %g\n' % (mode_chisq, mode_chisq_err)
         
