@@ -51,7 +51,7 @@ class Spectrum():
         if (np.size(data,1) > 2) and (not options.std_madfm):
             self.y.sigma = np.abs(data[:,2])
         else:
-            filtered = self.y.data[~np.isnan(self.y.data) & (self.y.data!=0.0)]
+            filtered = self.y.data[~np.isnan(self.y.data) & (self.y.data!=0.)]
             sigma_rough = std_madfm(filtered)
             clipped = filtered[np.abs(filtered-np.median(filtered))<=3.0*sigma_rough]
             self.y.sigma = std_madfm(clipped)*np.ones(self.y.data.shape)
@@ -61,7 +61,7 @@ class Spectrum():
         self.ndata = len(self.x.data)
 
         # Down weight all channels flagged with 'NaN' or "0"
-        self.y.sigma[np.isnan(self.y.data) | (self.y.data==0.0)] = 1.e99
+        self.y.sigma[np.isnan(self.y.data) | (self.y.data==0.) | np.isnan(self.y.sigma) | (self.y.sigma==0.)] = 1.e99
         self.y.data[np.isnan(self.y.data)] = 0.
 
         # Generate covariance matrix if required
