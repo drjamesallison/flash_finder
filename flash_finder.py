@@ -13,6 +13,8 @@ import string
 import numpy as np
 import warnings
 from astropy.io import ascii
+from astropy.table import Table
+from glob import glob
 if 'PYMULTINEST' in os.environ:
     sys.path.append(os.environ['PYMULTINEST'])
 import pymultinest
@@ -53,10 +55,19 @@ if (mpi_rank == 0) or (not options.init_MPI):
     print('Copyright 2018 James R. Allison. All rights reserved.')
     print('******************************************************************************\n')
 
-    # Read source information from file
+    # Read source information from file or list spectra in directory
     if (mpi_rank == 0):
 
-        source_list = ascii.read(options.data_path+'sources.log',format='commented_header',comment='#')
+        source_list = Table()
+        if os.path.exists(options.data_path+'sources.log'):
+            source_list = ascii.read(options.data_path+'sources.log',format='commented_header',comment='#')
+        else:
+            source_list['name'] = glob(options.data_path+'/*opd.dat')
+            index = 0
+            for index in np.arange(0,len(source_list['name'])):
+                name = source_list['name'][index].split('/')[-1]
+                source_list['name'][index] = name.strip('.dat')
+                index += 1
 
         # Check for required information
         if 'name' not in source_list.colnames:
@@ -111,17 +122,17 @@ if (mpi_rank == 0) or (not options.init_MPI):
         source.info = line
 
         # Report source name 
-        print('\nCPU %d: Working on Source %s.\n'% (mpi_rank,source.info['name']))
+        print('\nCPU %d: Working on Source %s.\n' % (mpi_rank,source.info['name']))
 
         # Assign output root name
-        options.out_root = '%s/%s'%(options.out_path,source.info['name'])
+        options.out_root = '%s/%s' % (options.out_path,source.info['name'])
 
         # Generate spectral data
-        source.spectrum.filename = '%s/%s.dat'%(options.data_path,source.info['name'])
-        if os.path.exists(source.spectrum.filename):           
+        source.spectrum.filename = '%s/%s.dat' % (options.data_path,source.info['name'])
+        if os.path.exists(source.spectrum.filename):
             source.spectrum.generate_data(options)
         else:
-            print('\nCPU %d: Spectrum for source %s does not exist. Moving on.\n'% (mpi_rank,source.info['name']))
+            print('\nCPU %d: Spectrum for source %s does not exist. Moving on.\n' % (mpi_rank,source.info['name']))
             continue
 
         # Initialize and generate model object
