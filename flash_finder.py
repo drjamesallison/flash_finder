@@ -66,7 +66,7 @@ if (mpi_rank == 0) or (not options.init_MPI):
             index = 0
             for index in np.arange(0,len(source_list['name'])):
                 name = source_list['name'][index].split('/')[-1]
-                source_list['name'][index] = name.strip('.dat')
+                source_list['name'][index] = name.split('.dat')[-1]
                 index += 1
 
         # Check for required information
