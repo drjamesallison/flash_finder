@@ -5,12 +5,9 @@
 --data_path $FINDER'/examples/data/' \
 --nlive 500 \
 --channel_function 'none' \
---channel_path $FINDER'/examples/data/hipass_channel.dat' \
 --plot_restframe 'none' \
 --noise_factor '1.00' \
---x0_sigma '200' \
---watch \
 --verbose \
 --param_out 'median' \
---mmodal \
 --plot_switch \
+#--mmodal \

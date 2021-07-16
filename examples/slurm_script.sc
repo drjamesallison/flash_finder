@@ -5,6 +5,7 @@
 #SBATCH --job-name=flashfinder_test
 #SBATCH --no-requeue
 #SBATCH --export=NONE
+#SBATCH --account=ja3
 
 module load python
 module load argparse
@@ -34,9 +35,7 @@ srun --export=ALL --ntasks=20 --ntasks-per-node=20 python $FINDER/flash_finder.p
 --data_path $FINDER'/examples/data/' \
 --nlive 500 \
 --channel_function 'none' \
---channel_path $FINDER'/examples/data/hipass_channel.dat' \
 --plot_restframe 'none' \
 --noise_factor '1.00' \
---x0_sigma '200' \
 --mmodal \
 --mpi_switch \
