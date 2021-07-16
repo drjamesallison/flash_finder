@@ -57,7 +57,7 @@ parser.add_argument('--plot_nchans', default=200, type=int,
 parser.add_argument('--plot_restframe', choices = ['none','source','peak'], default='peak', type=str,
                     help='restframe used for plotting')
 parser.add_argument('--rest_frequency', default=1.420405752, type=float,
-                    help='rest frequency of transition in GHz')
+                    help='rest frequency of transition')
 parser.add_argument('--small_plots', action='store_true', default=False,
                     help='plot a small range of the x-axis')
 parser.add_argument('--std_madfm', action='store_true', default=False,
@@ -69,7 +69,7 @@ parser.add_argument('--verbose',action='store_true',default=False,
 parser.add_argument('--watch',action='store_true',default=False,
                     help='switch on progress plots')
 parser.add_argument('--x_units', choices = ['frequency','optvel','redshift'], default='optvel', type=str,
-                    help='units for the spectral x-axis (GHz, km/s or z)')
+                    help='units for the spectral x-axis')
 parser.add_argument('--x_max', default=1.e99, type=float,
                     help='maximum value for x-axis')
 parser.add_argument('--x_min', default=-1.e99, type=float,

@@ -49,7 +49,7 @@ def initialize_resultsfile(options,model):
         text += ' abs_intopd_median(km/s) abs_intopd_siglo(km/s) abs_intopd_sighi(km/s)'
         text += ' abs_width_median(km/s) abs_width_siglo(km/s) abs_width_sighi(km/s)'
 
-    text += ' R_mean R_sigma'
+    text += ' ln(B)_mean ln(B)_sigma'
     text += ' chisq_mean chisq_sigma\n'
 
     f.write(text)

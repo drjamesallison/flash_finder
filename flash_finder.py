@@ -134,7 +134,7 @@ if (mpi_rank == 0) or (not options.init_MPI):
         else:
             print('\nCPU %d: Spectrum for source %s does not exist. Moving on.\n' % (mpi_rank,source.info['name']))
             continue
-
+            
         # Initialize and generate model object
         model = Model()
         model.input.generate_model(options,source)

@@ -168,7 +168,7 @@ def bestfit_spectrum(options,source,model):
         # Add evidence value to plot
         if model.output.ndetections != 0:
             if options.plot_evidence:
-                plt.suptitle(r'$R = %0.2f \pm %0.2f$' % (mode_evidence, mode_evidence_err),
+                plt.suptitle(r'$ln(B) = %0.2f \pm %0.2f$' % (mode_evidence, mode_evidence_err),
                              x=0.65, y=(0.2*y_ratio + 1)/(1+y_ratio), horizontalalignment='left', fontsize=font_size-2)
 
         # Add additional vertical and horizontal lines
