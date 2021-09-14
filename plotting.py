@@ -175,7 +175,7 @@ def bestfit_spectrum(options,source,model):
         if options.plot_restframe != 'none':
             ax1.vlines(0.0,y1_min,y1_max,colors='k',linestyle=':')
             ax2.vlines(0.0,y2_min,y2_max,colors='k',linestyle=':')
-        else:
+        elif 'z' in source.info:
             ax1.vlines(float(source.info['z'])/1e3,y1_min,y1_max,colors='k',linestyle=':')
             ax2.vlines(float(source.info['z'])/1e3,y2_min,y2_max,colors='k',linestyle=':')
         ax1.axhline(color='k', linestyle=':', zorder=0)
@@ -189,7 +189,7 @@ def bestfit_spectrum(options,source,model):
             ax2.set_xlabel(r"$v\,[\mathrm{km}\,\mathrm{s}^{-1}]$", fontsize=font_size)
             # ax2.set_xlabel(r'$\mathrm{Relative}\,\mathrm{Gas}\,\mathrm{Velocity}\,(\mathrm{km}\,\mathrm{s}^{-1})$', fontsize=font_size)
         elif options.x_units == 'optvel':
-            ax2.set_xlabel(r"$cz\,[\mathrm{km}\,\mathrm{s}^{-1}]$", fontsize=font_size)
+            ax2.set_xlabel(r"$v\,[\mathrm{km}\,\mathrm{s}^{-1}]$", fontsize=font_size)
         else:        
             ax2.set_xlabel(r"$z$", fontsize=font_size)
         if (options.y_units == 'mJy') or (options.y_units == 'Jy'):
