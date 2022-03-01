@@ -61,7 +61,9 @@ class Spectrum():
         self.ndata = len(self.x.data)
 
         # Down weight all channels flagged with 'NaN' or "0"
-        self.y.sigma[np.isnan(self.y.data) | (self.y.data==0.) | np.isnan(self.y.sigma) | (self.y.sigma==0.)] = 1.e99
+        # self.y.sigma[np.isnan(self.y.data) | (self.y.data==0.) | np.isnan(self.y.sigma) | (self.y.sigma==0.)] = 1.e99
+        self.y.sigma[np.isnan(self.y.data) | (self.y.data==0.) | np.isinf(self.y.data)] = 1.e99
+        self.y.sigma[np.isnan(self.y.sigma) | (self.y.sigma==0.) | np.isinf(self.y.data)] = 1.e99
         self.y.data[np.isnan(self.y.data)] = 0.
 
         # Generate covariance matrix if required
