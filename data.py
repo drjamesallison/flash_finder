@@ -41,7 +41,7 @@ class Spectrum():
         if os.path.exists(options.mask_path):
             masks = np.genfromtxt(options.mask_path, comments='#')
             for mask in masks:
-                self.y.data[(self.y.data > np.min(mask)) & (self.y.data < np.max(mask))] = 0.
+                self.y.data[(self.x.data > np.min(mask)) & (self.x.data < np.max(mask))] = 0.
 
         # Invert data if required
         if options.invert_spectra:
